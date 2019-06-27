@@ -55,10 +55,9 @@
     "tslint": "^5.16.0",
     "typescript": "^3.5.1",
     "vscode-languageserver-types": "^3.14.0",
+    "vscode-languageserver-protocol": "^3.14.1",
     "webpack": "^4.34.0",
     "webpack-cli": "^3.3.4"
   },
-  "dependencies": {
-    "vscode-languageserver-protocol": "^3.14.1"
-  }
+  "dependencies": {}
 }
