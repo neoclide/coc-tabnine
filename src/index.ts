@@ -17,12 +17,6 @@ export async function activate(context: ExtensionContext): Promise<void> {
 
   const triggers = []
   for (let i = 32; i <= 126; i++) {
-    if (i >= 65 && i <= 90) {
-      continue
-    }
-    if (i >= 97 && i <= 122) {
-      continue
-    }
     triggers.push(String.fromCharCode(i))
   }
 
