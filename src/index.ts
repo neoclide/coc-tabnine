@@ -19,9 +19,12 @@ export async function activate(context: ExtensionContext): Promise<void> {
   for (let i = 32; i <= 126; i++) {
     triggers.push(String.fromCharCode(i))
   }
+  let priority = configuration.get<number>('priority', 100)
+  let disable_filetyps = configuration.get<string[]>('disable_filetyps', [])
 
   languages.registerCompletionItemProvider('tabnine', configuration.get<string>('shortcut', 'TN'), null, {
     async provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken, context: CompletionContext): Promise<CompletionItem[] | undefined | null> {
+      if (disable_filetyps.includes(document.languageId)) return null
       try {
         const offset = document.offsetAt(position)
         const before_start_offset = Math.max(0, offset - CHAR_LIMIT)
@@ -79,7 +82,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
         console.log(`Error setting up request: ${e}`)
       }
     }
-  }, triggers, 100)
+  }, triggers, priority)
 
   function makeCompletionItem(args: {
     document: TextDocument,

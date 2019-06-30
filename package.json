@@ -28,6 +28,16 @@
           "default": "TN",
           "description": "shortcut  for tabnine source."
         },
+        "tabnine.priority": {
+          "type": "number",
+          "default": 100,
+          "description": "Priority of tabnine source."
+        },
+        "tabnine.disable_filetyps": {
+          "type": "array",
+          "default": [],
+          "description": "Disable TabNine with configured filetypes."
+        },
         "tabnine.disable_line_regex": {
           "type": "array",
           "default": [],
