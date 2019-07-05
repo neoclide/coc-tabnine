@@ -125,6 +125,10 @@ export async function activate(context: ExtensionContext): Promise<void> {
     }
     item.preselect = (args.index === 0)
     item.kind = args.entry.kind
+    let pre = args.document.getText(Range.create(args.position.line, 0, args.position.line, args.position.character))
+    if (pre.indexOf('TabNine::') !== -1) {
+      item.filterText = pre
+    }
     return item
   }
 
