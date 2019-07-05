@@ -1,4 +1,4 @@
-import { Uri, ExtensionContext, workspace, languages } from 'coc.nvim'
+import { fetch, Uri, ExtensionContext, workspace, languages } from 'coc.nvim'
 import { Range, CompletionItem, TextDocument, Position, CancellationToken, CompletionContext, TextEdit, MarkupContent, MarkupKind, CompletionItemKind, InsertTextFormat } from 'vscode-languageserver-protocol'
 import child_process from 'child_process'
 import semver from 'semver'
@@ -6,6 +6,8 @@ import fs from 'fs'
 import path from 'path'
 import readline from 'readline'
 import { Mutex } from 'await-semaphore'
+import mkdirp from 'mkdirp'
+import download from './download'
 
 const CHAR_LIMIT = 100000
 const MAX_NUM_RESULTS = 5
@@ -13,7 +15,12 @@ const DEFAULT_DETAIL = "TabNine"
 
 export async function activate(context: ExtensionContext): Promise<void> {
   const configuration = workspace.getConfiguration('tabnine')
-  const tabNine = new TabNine()
+  const tabNine = new TabNine(context.storagePath)
+  let binaryRoot = path.join(context.storagePath, 'binaries')
+  if (!fs.existsSync(binaryRoot)) {
+    mkdirp.sync(binaryRoot)
+  }
+  await TabNine.installTabNine(binaryRoot)
 
   const triggers = []
   for (let i = 32; i <= 126; i++) {
@@ -211,7 +218,7 @@ class TabNine {
   private childDead: boolean
   private mutex: Mutex = new Mutex()
 
-  constructor() {
+  constructor(private storagePath: string) {
     // noop
   }
 
@@ -266,7 +273,7 @@ class TabNine {
     const args = [
       "--client=vscode",
     ]
-    const binary_root = path.join(__dirname, "..", "binaries")
+    const binary_root = path.join(this.storagePath, "binaries")
     const command = TabNine.getBinaryPath(binary_root)
     this.proc = child_process.spawn(command, args)
     this.childDead = false
@@ -290,6 +297,51 @@ class TabNine {
     })
   }
 
+  // install if not exists
+  public static async installTabNine(root): Promise<void> {
+    try {
+      let path = TabNine.getBinaryPath(root)
+      if (path) return
+    } catch (e) {
+      // noop
+    }
+    let version = await fetch('https://update.tabnine.com/version')
+    version = version.trim()
+
+    let arch
+    if (process.arch == 'x32') {
+      arch = 'i686'
+    } else if (process.arch == 'x64') {
+      arch = 'x86_64'
+    } else {
+      throw new Error(`Sorry, the architecture '${process.arch}' is not supported by TabNine.`)
+    }
+    let suffix
+    if (process.platform == 'win32') {
+      suffix = 'pc-windows-gnu/TabNine.exe'
+    } else if (process.platform == 'darwin') {
+      suffix = 'apple-darwin/TabNine'
+    } else if (process.platform == 'linux') {
+      suffix = 'unknown-linux-gnu/TabNine'
+    } else {
+      throw new Error(`Sorry, the platform '${process.platform}' is not supported by TabNine.`)
+    }
+    let url = `https://update.tabnine.com/${version}/${arch}-${suffix}`
+    let item = workspace.createStatusBarItem(0, { progress: true })
+    item.text = 'Downloading TabNine'
+    item.show()
+    try {
+      let dest = path.join(root, `${version}/${arch}-${suffix}`)
+      await download(url, dest, percent => {
+        item.text = `Downloading TabNine ${(percent * 100).toFixed(0)}%`
+      })
+      fs.chmodSync(dest, 0o755)
+    } catch (e) {
+      workspace.showMessage(`Download error ${e.message}`, 'error')
+    }
+    item.dispose()
+  }
+
   private static getBinaryPath(root): string {
     let arch
     if (process.arch == 'x32') {
@@ -310,6 +362,9 @@ class TabNine {
       throw new Error(`Sorry, the platform '${process.platform}' is not supported by TabNine.`)
     }
     const versions = fs.readdirSync(root)
+    if (!versions || versions.length == 0) {
+      throw new Error('TabNine not installed')
+    }
     TabNine.sortBySemver(versions)
     const tried = []
     for (let version of versions) {
