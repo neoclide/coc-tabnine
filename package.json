@@ -30,8 +30,8 @@
         },
         "tabnine.priority": {
           "type": "number",
-          "default": 100,
-          "description": "Priority of tabnine source."
+          "default": null,
+          "description": "Priority of tabnine source, use priority of languageserver by default."
         },
         "tabnine.disable_filetyps": {
           "type": "array",

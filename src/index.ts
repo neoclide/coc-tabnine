@@ -1,5 +1,5 @@
 import { fetch, Uri, ExtensionContext, workspace, languages } from 'coc.nvim'
-import { Range, CompletionItem, TextDocument, Position, CancellationToken, CompletionContext, TextEdit, MarkupContent, MarkupKind, CompletionItemKind, InsertTextFormat } from 'vscode-languageserver-protocol'
+import { Range, CompletionItem, CompletionList, TextDocument, Position, CancellationToken, CompletionContext, TextEdit, MarkupContent, MarkupKind, CompletionItemKind, InsertTextFormat } from 'vscode-languageserver-protocol'
 import child_process from 'child_process'
 import semver from 'semver'
 import fs from 'fs'
@@ -13,6 +13,14 @@ const CHAR_LIMIT = 100000
 const MAX_NUM_RESULTS = 5
 const DEFAULT_DETAIL = "TabNine"
 
+export function isWordCharacter(code: number): boolean {
+  if (code == 95) return true
+  if (code >= 48 && code <= 57) return true
+  if (code >= 65 && code <= 90) return true
+  if (code >= 97 && code <= 122) return true
+  return false
+}
+
 export async function activate(context: ExtensionContext): Promise<void> {
   const configuration = workspace.getConfiguration('tabnine')
   const tabNine = new TabNine(context.storagePath)
@@ -24,13 +32,15 @@ export async function activate(context: ExtensionContext): Promise<void> {
 
   const triggers = []
   for (let i = 32; i <= 126; i++) {
-    triggers.push(String.fromCharCode(i))
+    if (!isWordCharacter(i)) {
+      triggers.push(String.fromCharCode(i))
+    }
   }
   let priority = configuration.get<number>('priority', 100)
   let disable_filetyps = configuration.get<string[]>('disable_filetyps', [])
 
   languages.registerCompletionItemProvider('tabnine', configuration.get<string>('shortcut', 'TN'), null, {
-    async provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken, context: CompletionContext): Promise<CompletionItem[] | undefined | null> {
+    async provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken, context: CompletionContext): Promise<CompletionList | undefined | null> {
       if (disable_filetyps.includes(document.languageId)) return null
       try {
         const offset = document.offsetAt(position)
@@ -54,11 +64,11 @@ export async function activate(context: ExtensionContext): Promise<void> {
           return undefined
         }
         const response: AutocompleteResult = await request
-        let completionList: CompletionItem[]
+        let completionList: CompletionList
         if (response.results.length === 0) {
-          completionList = []
+          completionList = { items: [], isIncomplete: false }
         } else {
-          const results = []
+          const results: CompletionItem[] = []
           let detailMessage = ""
           for (const msg of response.user_message) {
             if (detailMessage !== "") {
@@ -81,7 +91,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
             }))
             index += 1
           }
-          completionList = results
+          completionList = { items: results, isIncomplete: true }
         }
         return completionList
       } catch (e) {
@@ -127,10 +137,10 @@ export async function activate(context: ExtensionContext): Promise<void> {
       } else {
         item.detail = args.detailMessage
       }
-    } else {
+    } else if (args.detailMessage.indexOf('Buy a license') == -1) {
       item.detail = args.detailMessage
     }
-    item.preselect = (args.index === 0)
+    // item.preselect = (args.index === 0)
     item.kind = args.entry.kind
     let pre = args.document.getText(Range.create(args.position.line, 0, args.position.line, args.position.character))
     if (pre.indexOf('TabNine::') !== -1) {
