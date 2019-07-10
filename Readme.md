@@ -21,6 +21,30 @@ In your vim/neovim, run command:
 :CocInstall coc-tabnine
 ```
 
+## Configuration
+
+Use command `:CocConfig` to open user configuration file of coc.nvim.
+
+- "tabnine.shortcut":~
+
+      	shortcut  for tabnine source.,  default: `"TN"`
+
+- "tabnine.priority":~
+
+      	Priority of tabnine source.,  default: `100`
+
+- "tabnine.disable_filetyps":~
+
+      	Disable TabNine with configured filetypes.,  default: `[]`
+
+- "tabnine.disable_line_regex":~
+
+      	Disable TabNine when the current line contains a match of any of the provided regexes. For example, add "require" to disable TabNine when the current line contains the word 'require'.,  default: `[]`
+
+- "tabnine.disable_file_regex":~
+
+      	Disable TabNine when the file path contains a match of any of the provided regexes. For example, add "[.]js$" to disable TabNine in JavaScript files.,  default: `[]`
+
 ## License
 
 MIT
