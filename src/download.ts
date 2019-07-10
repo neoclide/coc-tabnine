@@ -70,10 +70,8 @@ export default function download(url: string, dest: string, onProgress: (msg: nu
           })
         }
       }
-      res.pipe(fs.createWriteStream(dest))
-      res.on('end', () => {
-        setTimeout(resolve, 50)
-      })
+      let stream = res.pipe(fs.createWriteStream(dest))
+      stream.on('finish', resolve)
     })
     req.on('error', reject)
     req.end()
