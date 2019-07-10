@@ -21,6 +21,12 @@ In your vim/neovim, run command:
 :CocInstall coc-tabnine
 ```
 
+## Commands
+
+- `tabnine.openConfig`: open config file of tabnine.
+
+_Note_: to make coc.nvim works better with TabNine, add `"ignore_all_lsp": true` to config file of tabnine.
+
 ## Configuration
 
 Use command `:CocConfig` to open user configuration file of coc.nvim.
