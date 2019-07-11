@@ -67,11 +67,10 @@
     "vscode-languageserver-protocol": "^3.14.1",
     "vscode-languageserver-types": "^3.14.0",
     "webpack": "^4.34.0",
-    "webpack-cli": "^3.3.4"
-  },
-  "dependencies": {
+    "webpack-cli": "^3.3.4",
     "follow-redirects": "^1.7.0",
     "mkdirp": "^0.5.1",
     "tunnel": "^0.0.6"
-  }
+  },
+  "dependencies": {}
 }
