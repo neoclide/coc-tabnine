@@ -62,7 +62,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
 
   subscriptions.push(languages.registerCompletionItemProvider('tabnine', configuration.get<string>('shortcut', 'TN'), null, {
     async provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken, context: CompletionContext): Promise<CompletionList | undefined | null> {
-      if (disable_filetyps.includes(document.languageId)) return null
+      if (disable_filetyps.indexOf(document.languageId) !== -1) return null
       try {
         const offset = document.offsetAt(position)
         const before_start_offset = Math.max(0, offset - CHAR_LIMIT)
@@ -96,9 +96,6 @@ export async function activate(context: ExtensionContext): Promise<void> {
               detailMessage += "\n"
             }
             detailMessage += msg
-          }
-          if (detailMessage === "") {
-            detailMessage = DEFAULT_DETAIL
           }
           let index = 0
           for (const entry of response.results) {
@@ -152,9 +149,9 @@ export async function activate(context: ExtensionContext): Promise<void> {
     if (args.entry.documentation) {
       item.documentation = formatDocumentation(args.entry.documentation)
     }
-    if (args.entry.detail) item.detail = args.entry.detail
-    let { detail } = item
-    if (detail && (detail == DEFAULT_DETAIL || detail.indexOf('Buy a license') != -1)) {
+    item.detail = args.entry.detail ? args.entry.detail : args.detailMessage
+    let detail = item.detail || ''
+    if (detail == DEFAULT_DETAIL || detail.indexOf('Buy a license') != -1) {
       delete item.detail
     }
     if (item.detail == null && item.insertTextFormat != InsertTextFormat.Snippet) {
@@ -167,8 +164,6 @@ export async function activate(context: ExtensionContext): Promise<void> {
       item.kind = args.entry.kind
     } else if (item.insertTextFormat == InsertTextFormat.Snippet) {
       item.kind = CompletionItemKind.Snippet
-    } else {
-      item.kind = CompletionItemKind.Text
     }
     let pre = args.document.getText(Range.create(args.position.line, 0, args.position.line, args.position.character))
     if (pre.indexOf('TabNine::') !== -1) {
