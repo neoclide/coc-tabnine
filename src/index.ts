@@ -153,15 +153,23 @@ export async function activate(context: ExtensionContext): Promise<void> {
       item.documentation = formatDocumentation(args.entry.documentation)
     }
     if (args.entry.detail) item.detail = args.entry.detail
-    if (item.detail == DEFAULT_DETAIL || item.detail.indexOf('Buy a license') != -1) {
+    let { detail } = item
+    if (detail && (detail == DEFAULT_DETAIL || detail.indexOf('Buy a license') != -1)) {
       delete item.detail
     }
     if (item.detail == null && item.insertTextFormat != InsertTextFormat.Snippet) {
+      item.data = item.data || {}
       item.data.dup = 0
     } else if (args.index == 0 && item.insertTextFormat == InsertTextFormat.Snippet) {
       item.preselect = true
     }
-    item.kind = args.entry.kind
+    if (args.entry.kind) {
+      item.kind = args.entry.kind
+    } else if (item.insertTextFormat == InsertTextFormat.Snippet) {
+      item.kind = CompletionItemKind.Snippet
+    } else {
+      item.kind = CompletionItemKind.Text
+    }
     let pre = args.document.getText(Range.create(args.position.line, 0, args.position.line, args.position.character))
     if (pre.indexOf('TabNine::') !== -1) {
       item.filterText = pre
