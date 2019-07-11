@@ -152,19 +152,15 @@ export async function activate(context: ExtensionContext): Promise<void> {
     if (args.entry.documentation) {
       item.documentation = formatDocumentation(args.entry.documentation)
     }
-    if (args.entry.detail) {
-      if (args.detailMessage === DEFAULT_DETAIL || args.detailMessage.includes("Your project contains")) {
-        item.detail = args.entry.detail
-      } else {
-        item.detail = args.detailMessage
-      }
-    } else if (args.detailMessage.indexOf('Buy a license') == -1) {
-      item.detail = args.detailMessage
-    }
-    if (item.detail == 'TabNine') {
+    if (args.entry.detail) item.detail = args.entry.detail
+    if (item.detail == DEFAULT_DETAIL || item.detail.indexOf('Buy a license') != -1) {
       delete item.detail
     }
-    item.preselect = (args.index === 0)
+    if (item.detail == null && item.insertTextFormat != InsertTextFormat.Snippet) {
+      item.data.dup = 0
+    } else if (args.index == 0 && item.insertTextFormat == InsertTextFormat.Snippet) {
+      item.preselect = true
+    }
     item.kind = args.entry.kind
     let pre = args.document.getText(Range.create(args.position.line, 0, args.position.line, args.position.character))
     if (pre.indexOf('TabNine::') !== -1) {
