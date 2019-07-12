@@ -1,4 +1,4 @@
-import { fetch, commands, Uri, ExtensionContext, workspace, languages } from 'coc.nvim'
+import { fetch, sources, commands, Uri, ExtensionContext, workspace, languages } from 'coc.nvim'
 import { Range, CompletionItem, CompletionList, TextDocument, Position, CancellationToken, CompletionContext, TextEdit, MarkupContent, MarkupKind, CompletionItemKind, InsertTextFormat } from 'vscode-languageserver-protocol'
 import child_process from 'child_process'
 import semver from 'semver'
@@ -64,6 +64,10 @@ export async function activate(context: ExtensionContext): Promise<void> {
   subscriptions.push(languages.registerCompletionItemProvider('tabnine', configuration.get<string>('shortcut', 'TN'), null, {
     async provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken, context: CompletionContext): Promise<CompletionList | undefined | null> {
       if (disable_filetyps.indexOf(document.languageId) !== -1) return null
+      let { option } = context as any
+      let pre = option.line.slice(0, position.character)
+      let arr = sources.getTriggerSources(pre, document.languageId)
+      if (arr.length > 1) return { items: [], isIncomplete: false }
       try {
         const offset = document.offsetAt(position)
         const before_start_offset = Math.max(0, offset - CHAR_LIMIT)
@@ -110,7 +114,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
             }))
             index += 1
           }
-          completionList = { items: results, isIncomplete: true }
+          completionList = { items: results, isIncomplete: option.input.length <= 3 }
         }
         return completionList
       } catch (e) {
