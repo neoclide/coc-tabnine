@@ -13,8 +13,9 @@ const CHAR_LIMIT = 100000
 const MAX_NUM_RESULTS = 5
 const DEFAULT_DETAIL = "TabNine"
 
-export function isWordCharacter(code: number): boolean {
+export function isInvalidTrigger(code: number): boolean {
   if (code == 95) return true
+  if (code == 32) return true
   if (code >= 48 && code <= 57) return true
   if (code >= 65 && code <= 90) return true
   if (code >= 97 && code <= 122) return true
@@ -33,7 +34,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
 
   const triggers = []
   for (let i = 32; i <= 126; i++) {
-    if (!isWordCharacter(i)) {
+    if (!isInvalidTrigger(i)) {
       triggers.push(String.fromCharCode(i))
     }
   }
