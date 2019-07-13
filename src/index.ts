@@ -85,15 +85,21 @@ export async function activate(context: ExtensionContext): Promise<void> {
             detailMessage += msg
           }
           let index = 0
+          let hasPreselect = false
           for (const entry of response.results) {
-            results.push(makeCompletionItem({
+            let item = makeCompletionItem({
               document,
               index,
               position,
               detailMessage,
+              hasPreselect,
               old_prefix: response.old_prefix,
               entry,
-            }))
+            })
+            if (item.preselect) {
+              hasPreselect = true
+            }
+            results.push(item)
             index += 1
           }
           completionList = { items: results, isIncomplete: option.input.length <= 3 }
@@ -113,6 +119,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
     detailMessage: string,
     old_prefix: string,
     entry: ResultEntry,
+    hasPreselect: boolean
   }): CompletionItem {
     let item: CompletionItem = {
       label: args.entry.new_prefix + args.entry.new_suffix
@@ -144,7 +151,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
     if (item.detail == null && item.insertTextFormat != InsertTextFormat.Snippet) {
       item.data = item.data || {}
       item.data.dup = 0
-    } else if (args.index == 0 && item.insertTextFormat == InsertTextFormat.Snippet) {
+    } else if (!args.hasPreselect && item.insertTextFormat == InsertTextFormat.Snippet) {
       item.preselect = true
     }
     if (args.entry.kind) {
