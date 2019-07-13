@@ -28,6 +28,14 @@
           "default": "TN",
           "description": "shortcut  for tabnine source."
         },
+        "tabnine.triggers": {
+          "type": "array",
+          "default": [],
+          "description": "Trigger characters for TabNine source",
+          "items": {
+            "type": "string"
+          }
+        },
         "tabnine.priority": {
           "type": "number",
           "default": null,

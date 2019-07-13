@@ -1,4 +1,4 @@
-import { fetch, sources, commands, Uri, ExtensionContext, workspace, languages } from 'coc.nvim'
+import { fetch, commands, Uri, ExtensionContext, workspace, languages } from 'coc.nvim'
 import { Range, CompletionItem, CompletionList, TextDocument, Position, CancellationToken, CompletionContext, TextEdit, MarkupContent, MarkupKind, CompletionItemKind, InsertTextFormat } from 'vscode-languageserver-protocol'
 import child_process from 'child_process'
 import semver from 'semver'
@@ -13,15 +13,6 @@ const CHAR_LIMIT = 100000
 const MAX_NUM_RESULTS = 5
 const DEFAULT_DETAIL = "TabNine"
 
-export function isInvalidTrigger(code: number): boolean {
-  if (code == 95) return true
-  if (code == 32) return true
-  if (code >= 48 && code <= 57) return true
-  if (code >= 65 && code <= 90) return true
-  if (code >= 97 && code <= 122) return true
-  return false
-}
-
 export async function activate(context: ExtensionContext): Promise<void> {
   let { subscriptions } = context
   const configuration = workspace.getConfiguration('tabnine')
@@ -32,12 +23,6 @@ export async function activate(context: ExtensionContext): Promise<void> {
   }
   await TabNine.installTabNine(binaryRoot)
 
-  const triggers = []
-  for (let i = 32; i <= 126; i++) {
-    if (!isInvalidTrigger(i)) {
-      triggers.push(String.fromCharCode(i))
-    }
-  }
   let priority = configuration.get<number>('priority', 100)
   let disable_filetyps = configuration.get<string[]>('disable_filetyps', [])
 
@@ -65,9 +50,6 @@ export async function activate(context: ExtensionContext): Promise<void> {
     async provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken, context: CompletionContext): Promise<CompletionList | undefined | null> {
       if (disable_filetyps.indexOf(document.languageId) !== -1) return null
       let { option } = context as any
-      let pre = option.line.slice(0, position.character)
-      let arr = sources.getTriggerSources(pre, document.languageId)
-      if (arr.length > 1) return { items: [], isIncomplete: false }
       try {
         const offset = document.offsetAt(position)
         const before_start_offset = Math.max(0, offset - CHAR_LIMIT)
@@ -122,7 +104,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
         console.log(`Error setting up request: ${e}`)
       }
     }
-  }, triggers, priority))
+  }, [], priority))
 
   function makeCompletionItem(args: {
     document: TextDocument,

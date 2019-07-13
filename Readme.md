@@ -9,10 +9,6 @@ This is the [coc.nvim](https://github.com/neoclide/coc.nvim) client for [TabNine
 - Zero configuration. TabNine works out of the box.
 - Highly responsive: typically produces a list of suggestions in less than 10 milliseconds.
 
-Many users choose to disable the default behavior of using Enter to accept completions, to avoid accepting a completion when they intended to start a new line. You can do this by going to _Settings → Editor: Accept Suggestion On Enter_ and setting it to _off_.
-
-A note on licensing: this repo includes source code as well as packaged TabNine binaries. The MIT license only applies to the source code, not the binaries. The binaries are covered by the [TabNine End User License Agreement](https://tabnine.com/eula).
-
 ## Install
 
 In your vim/neovim, run command:
@@ -31,25 +27,12 @@ _Note_: to make coc.nvim works better with TabNine, add `"ignore_all_lsp": true`
 
 Use command `:CocConfig` to open user configuration file of coc.nvim.
 
-- "tabnine.shortcut":~
-
-      	shortcut  for tabnine source.,  default: `"TN"`
-
-- "tabnine.priority":~
-
-      	Priority of tabnine source.,  default: `100`
-
-- "tabnine.disable_filetyps":~
-
-      	Disable TabNine with configured filetypes.,  default: `[]`
-
-- "tabnine.disable_line_regex":~
-
-      	Disable TabNine when the current line contains a match of any of the provided regexes. For example, add "require" to disable TabNine when the current line contains the word 'require'.,  default: `[]`
-
-- "tabnine.disable_file_regex":~
-
-      	Disable TabNine when the file path contains a match of any of the provided regexes. For example, add "[.]js$" to disable TabNine in JavaScript files.,  default: `[]`
+- _"tabnine.shortcut"_: Shortcut for tabnine source., default: `"TN"`
+- _"tabnine.triggers"_: Trigger characters of TabNine source, default: `[]`
+- _"tabnine.priority"_: Priority of tabnine source., default: `100`
+- _"tabnine.disable_filetyps"_: Disable TabNine with configured filetypes., default: `[]`
+- _"tabnine.disable_line_regex"_: Disable TabNine when the current line contains a match of any of the provided regexes. For example, add "require" to disable TabNine when the current line contains the word 'require'., default: `[]`
+- "tabnine.disable_file_regex": Disable TabNine when the file path contains a match of any of the provided regexes. For example, add "[.]js\$" to disable TabNine in JavaScript files., default: `[]`
 
 ## License
 
