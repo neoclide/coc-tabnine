@@ -151,7 +151,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
     if (item.detail == null && item.insertTextFormat != InsertTextFormat.Snippet) {
       item.data = item.data || {}
       item.data.dup = 0
-    } else if (!args.hasPreselect && item.insertTextFormat == InsertTextFormat.Snippet) {
+    } else if (args.index == 0 && item.insertTextFormat == InsertTextFormat.Snippet) {
       item.preselect = true
     }
     if (args.entry.kind) {
