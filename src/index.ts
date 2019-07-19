@@ -145,7 +145,9 @@ export async function activate(context: ExtensionContext): Promise<void> {
     }
     item.detail = args.entry.detail ? args.entry.detail : args.detailMessage
     let detail = item.detail || ''
-    if (detail == DEFAULT_DETAIL || detail.indexOf('Buy a license') != -1) {
+    if (detail == DEFAULT_DETAIL
+      || detail.indexOf('TabNine::sem') != -1
+      || detail.indexOf('Buy a license') != -1) {
       delete item.detail
     }
     if (item.detail == null && item.insertTextFormat != InsertTextFormat.Snippet) {
