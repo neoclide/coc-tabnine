@@ -25,6 +25,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
 
   let priority = configuration.get<number>('priority', undefined)
   let disable_filetyps = configuration.get<string[]>('disable_filetyps', [])
+  let limit = configuration.get<number>('limit', 10)
 
   subscriptions.push(commands.registerCommand('tabnine.openConfig', async () => {
     const res = await tabNine.request("1.0.7", {
@@ -102,7 +103,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
             results.push(item)
             index += 1
           }
-          completionList = { items: results, isIncomplete: option.input.length <= 3 }
+          completionList = { items: results.slice(0, limit), isIncomplete: option.input.length <= 3 }
         }
         return completionList
       } catch (e) {

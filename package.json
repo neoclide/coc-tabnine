@@ -36,6 +36,11 @@
             "type": "string"
           }
         },
+        "tabnine.limit": {
+          "type": "number",
+          "default": 10,
+          "description": "Limit max completion item count from tabnine."
+        },
         "tabnine.priority": {
           "type": "number",
           "default": null,
