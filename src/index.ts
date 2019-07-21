@@ -23,7 +23,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
   }
   await TabNine.installTabNine(binaryRoot)
 
-  let priority = configuration.get<number>('priority', 100)
+  let priority = configuration.get<number>('priority', undefined)
   let disable_filetyps = configuration.get<string[]>('disable_filetyps', [])
 
   subscriptions.push(commands.registerCommand('tabnine.openConfig', async () => {

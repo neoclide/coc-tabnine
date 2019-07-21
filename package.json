@@ -13,7 +13,7 @@
   },
   "scripts": {
     "clean": "rimraf lib",
-    "build": "webpack",
+    "build": "npx webpack",
     "prepare": "npx npm-run-all clean build"
   },
   "activationEvents": [
@@ -74,8 +74,6 @@
     "typescript": "^3.5.3",
     "vscode-languageserver-protocol": "^3.14.1",
     "vscode-languageserver-types": "^3.14.0",
-    "webpack": "^4.36.1",
-    "webpack-cli": "^3.3.6",
     "follow-redirects": "^1.7.0",
     "mkdirp": "^0.5.1",
     "tunnel": "^0.0.6"
