@@ -148,6 +148,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
     let detail = item.detail || ''
     if (detail == DEFAULT_DETAIL || [
         'Buy a license',
+        'Deep TabNine',
         'TabNine Cloud',
         'TabNine::sem',
       ].some(str => detail.includes(str))) {
