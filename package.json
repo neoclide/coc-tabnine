@@ -46,7 +46,7 @@
           "default": null,
           "description": "Priority of tabnine source, use priority of languageserver by default."
         },
-        "tabnine.disable_filetyps": {
+        "tabnine.disable_filetypes": {
           "type": "array",
           "default": [],
           "description": "Disable TabNine with configured filetypes."

@@ -24,7 +24,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
   await TabNine.installTabNine(binaryRoot)
 
   let priority = configuration.get<number>('priority', undefined)
-  let disable_filetyps = configuration.get<string[]>('disable_filetyps', [])
+  let disable_filetypes = configuration.get<string[]>('disable_filetypes', [])
   let limit = configuration.get<number>('limit', 10)
 
   subscriptions.push(commands.registerCommand('tabnine.openConfig', async () => {
@@ -49,7 +49,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
 
   subscriptions.push(languages.registerCompletionItemProvider('tabnine', configuration.get<string>('shortcut', 'TN'), null, {
     async provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken, context: CompletionContext): Promise<CompletionList | undefined | null> {
-      if (disable_filetyps.indexOf(document.languageId) !== -1) return null
+      if (disable_filetypes.indexOf(document.languageId) !== -1) return null
       let { option } = context as any
       try {
         const offset = document.offsetAt(position)
