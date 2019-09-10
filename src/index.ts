@@ -338,33 +338,17 @@ class TabNine {
     } catch (e) {
       // noop
     }
-    let version = await fetch('https://update.tabnine.com/version')
-    version = version.trim()
 
-    let arch
-    if (process.arch == 'x32') {
-      arch = 'i686'
-    } else if (process.arch == 'x64') {
-      arch = 'x86_64'
-    } else {
-      throw new Error(`Sorry, the architecture '${process.arch}' is not supported by TabNine.`)
-    }
-    let suffix
-    if (process.platform == 'win32') {
-      suffix = 'pc-windows-gnu/TabNine.exe'
-    } else if (process.platform == 'darwin') {
-      suffix = 'apple-darwin/TabNine'
-    } else if (process.platform == 'linux') {
-      suffix = 'unknown-linux-gnu/TabNine'
-    } else {
-      throw new Error(`Sorry, the platform '${process.platform}' is not supported by TabNine.`)
-    }
-    let url = `https://update.tabnine.com/${version}/${arch}-${suffix}`
-    let item = workspace.createStatusBarItem(0, { progress: true })
+    const version = (await fetch('https://update.tabnine.com/version')).trim();
+    const archAndPlatform = TabNine.getArchAndPlatform();
+    const url = `https://update.tabnine.com/${version}/${archAndPlatform}`
+    const item = workspace.createStatusBarItem(0, { progress: true })
+
     item.text = 'Downloading TabNine'
     item.show()
+
     try {
-      let dest = path.join(root, `${version}/${arch}-${suffix}`)
+      const dest = path.join(root, `${version}/${archAndPlatform}`)
       await download(url, dest, percent => {
         item.text = `Downloading TabNine ${(percent * 100).toFixed(0)}%`
       })
@@ -376,38 +360,54 @@ class TabNine {
   }
 
   private static getBinaryPath(root): string {
-    let arch
-    if (process.arch == 'x32') {
-      arch = 'i686'
-    } else if (process.arch == 'x64') {
-      arch = 'x86_64'
-    } else {
-      throw new Error(`Sorry, the architecture '${process.arch}' is not supported by TabNine.`)
-    }
-    let suffix
-    if (process.platform == 'win32') {
-      suffix = 'pc-windows-gnu/TabNine.exe'
-    } else if (process.platform == 'darwin') {
-      suffix = 'apple-darwin/TabNine'
-    } else if (process.platform == 'linux') {
-      suffix = 'unknown-linux-gnu/TabNine'
-    } else {
-      throw new Error(`Sorry, the platform '${process.platform}' is not supported by TabNine.`)
-    }
+    const archAndPlatform = TabNine.getArchAndPlatform()
     const versions = fs.readdirSync(root)
+
     if (!versions || versions.length == 0) {
       throw new Error('TabNine not installed')
     }
     TabNine.sortBySemver(versions)
+
     const tried = []
     for (let version of versions) {
-      const full_path = `${root}/${version}/${arch}-${suffix}`
+      const full_path = `${root}/${version}/${archAndPlatform}`
       tried.push(full_path)
       if (fs.existsSync(full_path)) {
         return full_path
       }
     }
     throw new Error(`Couldn't find a TabNine binary (tried the following paths: versions=${versions} ${tried})`)
+  }
+
+  private static getArchAndPlatform() {
+    let arch;
+    switch(process.arch) {
+      case 'x32':
+        arch = 'i686'
+        break
+      case 'x64':
+        arch = 'x86_64'
+        break
+      default:
+        throw new Error(`Sorry, the architecture '${process.arch}' is not supported by TabNine.`)
+    }
+
+    let suffix
+    switch(process.platform) {
+      case 'win32':
+        suffix = 'pc-windows-gnu/TabNine.exe'
+        break
+      case 'darwin':
+        suffix = 'apple-darwin/TabNine'
+        break
+      case 'linux':
+        suffix = 'unknown-linux-musl/TabNine'
+        break
+      default:
+        throw new Error(`Sorry, the platform '${process.platform}' is not supported by TabNine.`)
+    }
+
+    return `${arch}-${suffix}`
   }
 
   private static sortBySemver(versions: string[]): void {
