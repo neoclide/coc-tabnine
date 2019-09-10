@@ -147,11 +147,11 @@ export async function activate(context: ExtensionContext): Promise<void> {
     item.detail = args.entry.detail ? args.entry.detail : args.detailMessage
     let detail = item.detail || ''
     if (detail == DEFAULT_DETAIL || [
-        'Buy a license',
-        'Deep TabNine',
-        'TabNine Cloud',
-        'TabNine::sem',
-      ].some(str => detail.includes(str))) {
+      'Buy a license',
+      'Deep TabNine',
+      'TabNine Cloud',
+      'TabNine::sem',
+    ].some(str => detail.includes(str))) {
       delete item.detail
     }
     if (item.detail == null && item.insertTextFormat != InsertTextFormat.Snippet) {
@@ -339,8 +339,8 @@ class TabNine {
       // noop
     }
 
-    const version = (await fetch('https://update.tabnine.com/version')).trim();
-    const archAndPlatform = TabNine.getArchAndPlatform();
+    const version = (await fetch('https://update.tabnine.com/version')).trim()
+    const archAndPlatform = TabNine.getArchAndPlatform()
     const url = `https://update.tabnine.com/${version}/${archAndPlatform}`
     const item = workspace.createStatusBarItem(0, { progress: true })
 
@@ -381,7 +381,7 @@ class TabNine {
 
   private static getArchAndPlatform() {
     let arch;
-    switch(process.arch) {
+    switch (process.arch) {
       case 'x32':
         arch = 'i686'
         break
@@ -393,7 +393,7 @@ class TabNine {
     }
 
     let suffix
-    switch(process.platform) {
+    switch (process.platform) {
       case 'win32':
         suffix = 'pc-windows-gnu/TabNine.exe'
         break
