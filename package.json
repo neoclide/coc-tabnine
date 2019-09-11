@@ -46,20 +46,25 @@
           "default": null,
           "description": "Priority of tabnine source, use priority of languageserver by default."
         },
+        "tabnine.binary_path": {
+          "type": "string",
+          "default": "",
+          "description": "Use binary at specific path"
+        },
         "tabnine.disable_filetypes": {
           "type": "array",
           "default": [],
-          "description": "Disable TabNine with configured filetypes."
-        },
-        "tabnine.disable_line_regex": {
-          "type": "array",
-          "default": [],
-          "description": "Disable TabNine when the current line contains a match of any of the provided regexes. For example, add \"require\" to disable TabNine when the current line contains the word 'require'."
+          "description": "Disable TabNine for configured filetypes."
         },
         "tabnine.disable_file_regex": {
           "type": "array",
           "default": [],
           "description": "Disable TabNine when the file path contains a match of any of the provided regexes. For example, add \"[.]js$\" to disable TabNine in JavaScript files."
+        },
+        "tabnine.disable_line_regex": {
+          "type": "array",
+          "default": [],
+          "description": "Disable TabNine when the current line contains a match of any of the provided regexes. For example, add \"require\" to disable TabNine when the current line contains the word 'require'."
         }
       }
     }
