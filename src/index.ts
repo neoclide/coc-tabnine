@@ -28,7 +28,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
   let limit = configuration.get<number>('limit', 10)
 
   subscriptions.push(commands.registerCommand('tabnine.openConfig', async () => {
-    const res = await tabNine.request("1.0.7", {
+    const res = await tabNine.request("2.0.0", {
       Autocomplete: {
         filename: '1',
         before: 'TabNine::config_dir',
@@ -59,7 +59,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
         const after_end = document.positionAt(after_end_offset)
         const before = document.getText(Range.create(before_start, position))
         const after = document.getText(Range.create(position, after_end))
-        const request = tabNine.request("1.0.7", {
+        const request = tabNine.request("2.0.0", {
           Autocomplete: {
             filename: Uri.parse(document.uri).fsPath,
             before,
@@ -196,7 +196,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
     if (disable_line_regex === undefined) {
       disable_line_regex = []
     }
-    let line
+    let line: string
     for (const r of disable_line_regex) {
       if (line === undefined) {
         line = document.getText(Range.create(
@@ -331,7 +331,7 @@ class TabNine {
   }
 
   // install if not exists
-  public static async installTabNine(root): Promise<void> {
+  public static async installTabNine(root: string): Promise<void> {
     try {
       let path = TabNine.getBinaryPath(root)
       if (path) return
@@ -359,13 +359,14 @@ class TabNine {
     item.dispose()
   }
 
-  private static getBinaryPath(root): string {
+  private static getBinaryPath(root: string): string {
     const archAndPlatform = TabNine.getArchAndPlatform()
     const versions = fs.readdirSync(root)
 
     if (!versions || versions.length == 0) {
       throw new Error('TabNine not installed')
     }
+
     TabNine.sortBySemver(versions)
 
     const tried = []
@@ -379,8 +380,8 @@ class TabNine {
     throw new Error(`Couldn't find a TabNine binary (tried the following paths: versions=${versions} ${tried})`)
   }
 
-  private static getArchAndPlatform() {
-    let arch;
+  private static getArchAndPlatform(): string {
+    let arch: string
     switch (process.arch) {
       case 'x32':
         arch = 'i686'
@@ -392,7 +393,7 @@ class TabNine {
         throw new Error(`Sorry, the architecture '${process.arch}' is not supported by TabNine.`)
     }
 
-    let suffix
+    let suffix: string
     switch (process.platform) {
       case 'win32':
         suffix = 'pc-windows-gnu/TabNine.exe'
@@ -414,7 +415,7 @@ class TabNine {
     versions.sort(TabNine.cmpSemver)
   }
 
-  private static cmpSemver(a, b): number {
+  private static cmpSemver(a: string, b: string): number {
     const a_valid = semver.valid(a)
     const b_valid = semver.valid(b)
     if (a_valid && b_valid) { return semver.rcompare(a, b) }
