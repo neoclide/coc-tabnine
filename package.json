@@ -88,7 +88,9 @@
     "tunnel": "^0.0.6",
     "typescript": "^3.5.3",
     "vscode-languageserver-protocol": "^3.14.1",
-    "vscode-languageserver-types": "^3.14.0"
+    "vscode-languageserver-types": "^3.14.0",
+    "webpack": "^4.39.3",
+    "webpack-cli": "^3.3.8"
   },
   "dependencies": {}
 }
