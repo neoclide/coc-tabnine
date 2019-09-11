@@ -14,21 +14,26 @@ const MAX_NUM_RESULTS = 5
 const DEFAULT_DETAIL = "TabNine"
 
 export async function activate(context: ExtensionContext): Promise<void> {
-  let { subscriptions } = context
   const configuration = workspace.getConfiguration('tabnine')
-  const tabNine = new TabNine(context.storagePath)
-  let binaryRoot = path.join(context.storagePath, 'binaries')
-  if (!fs.existsSync(binaryRoot)) {
-    mkdirp.sync(binaryRoot)
-  }
-  await TabNine.installTabNine(binaryRoot)
+  const { subscriptions } = context
 
-  let priority = configuration.get<number>('priority', undefined)
-  let disable_filetypes = configuration.get<string[]>('disable_filetypes', [])
-  let limit = configuration.get<number>('limit', 10)
+  const binaryPath = configuration.get<string>('binary_path', undefined)
+  const disable_filetypes = configuration.get<string[]>('disable_filetypes', [])
+  const limit = configuration.get<number>('limit', 10)
+  const priority = configuration.get<number>('priority', undefined)
+
+  const tabNine = new TabNine(context.storagePath, binaryPath)
+  if (!binaryPath) {
+    const binaryRoot = path.join(context.storagePath, 'binaries')
+    await TabNine.installTabNine(binaryRoot)
+  } else {
+    if(!fs.existsSync(binaryPath)) {
+      throw new Error('Specified path to TabNine binary not found. ' + binaryPath)
+    }
+  }
 
   subscriptions.push(commands.registerCommand('tabnine.openConfig', async () => {
-    const res = await tabNine.request("1.0.7", {
+    const res = await tabNine.request("2.0.0", {
       Autocomplete: {
         filename: '1',
         before: 'TabNine::config_dir',
@@ -59,7 +64,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
         const after_end = document.positionAt(after_end_offset)
         const before = document.getText(Range.create(before_start, position))
         const after = document.getText(Range.create(position, after_end))
-        const request = tabNine.request("1.0.7", {
+        const request = tabNine.request("2.0.0", {
           Autocomplete: {
             filename: Uri.parse(document.uri).fsPath,
             before,
@@ -196,7 +201,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
     if (disable_line_regex === undefined) {
       disable_line_regex = []
     }
-    let line
+    let line: string
     for (const r of disable_line_regex) {
       if (line === undefined) {
         line = document.getText(Range.create(
@@ -245,14 +250,17 @@ interface MarkdownStringSpec {
 }
 
 class TabNine {
+  private childDead: boolean
+  private binaryPath?: string
+  private mutex: Mutex = new Mutex()
+  private numRestarts = 0
   private proc: child_process.ChildProcess
   private rl: readline.ReadLine
-  private numRestarts = 0
-  private childDead: boolean
-  private mutex: Mutex = new Mutex()
+  private storagePath: string
 
-  constructor(private storagePath: string) {
-    // noop
+  constructor(storagePath: string, binaryPath?: string) {
+    this.storagePath = storagePath
+    this.binaryPath = binaryPath
   }
 
   public async request(version: string, any_request: any): Promise<any> {
@@ -306,11 +314,12 @@ class TabNine {
     const args = [
       "--client=vscode",
     ]
-    const binary_root = path.join(this.storagePath, "binaries")
-    const command = TabNine.getBinaryPath(binary_root)
-    this.proc = child_process.spawn(command, args)
+
+    const binaryPath = this.binaryPath || TabNine.getBinaryPath(path.join(this.storagePath, "binaries"))
+
+    this.proc = child_process.spawn(binaryPath, args)
     this.childDead = false
-    this.proc.on('exit', (code, signal) => {
+    this.proc.on('exit', () => {
       this.childDead = true
     })
     this.proc.stdin.on('error', error => {
@@ -331,9 +340,13 @@ class TabNine {
   }
 
   // install if not exists
-  public static async installTabNine(root): Promise<void> {
+  public static async installTabNine(root: string): Promise<void> {
+    if (!fs.existsSync(root)) {
+      mkdirp.sync(root)
+    }
+
     try {
-      let path = TabNine.getBinaryPath(root)
+      const path = TabNine.getBinaryPath(root)
       if (path) return
     } catch (e) {
       // noop
@@ -359,28 +372,31 @@ class TabNine {
     item.dispose()
   }
 
-  private static getBinaryPath(root): string {
+  private static getBinaryPath(root: string): string {
     const archAndPlatform = TabNine.getArchAndPlatform()
     const versions = fs.readdirSync(root)
 
     if (!versions || versions.length == 0) {
       throw new Error('TabNine not installed')
     }
-    TabNine.sortBySemver(versions)
+
+    const sortedVersions = TabNine.sortBySemver(versions)
 
     const tried = []
-    for (let version of versions) {
-      const full_path = `${root}/${version}/${archAndPlatform}`
-      tried.push(full_path)
-      if (fs.existsSync(full_path)) {
-        return full_path
+    for (const version of sortedVersions) {
+      const fullPath = `${root}/${version}/${archAndPlatform}`
+
+      if (fs.existsSync(fullPath)) {
+        return fullPath
+      } else {
+        tried.push(fullPath)
       }
     }
-    throw new Error(`Couldn't find a TabNine binary (tried the following paths: versions=${versions} ${tried})`)
+    throw new Error(`Couldn't find a TabNine binary (tried the following paths: versions=${sortedVersions} ${tried})`)
   }
 
-  private static getArchAndPlatform() {
-    let arch;
+  private static getArchAndPlatform(): string {
+    let arch: string
     switch (process.arch) {
       case 'x32':
         arch = 'i686'
@@ -392,7 +408,7 @@ class TabNine {
         throw new Error(`Sorry, the architecture '${process.arch}' is not supported by TabNine.`)
     }
 
-    let suffix
+    let suffix: string
     switch (process.platform) {
       case 'win32':
         suffix = 'pc-windows-gnu/TabNine.exe'
@@ -410,11 +426,11 @@ class TabNine {
     return `${arch}-${suffix}`
   }
 
-  private static sortBySemver(versions: string[]): void {
-    versions.sort(TabNine.cmpSemver)
+  private static sortBySemver(versions: string[]): string[] {
+    return versions.sort(TabNine.cmpSemver)
   }
 
-  private static cmpSemver(a, b): number {
+  private static cmpSemver(a: string, b: string): number {
     const a_valid = semver.valid(a)
     const b_valid = semver.valid(b)
     if (a_valid && b_valid) { return semver.rcompare(a, b) }

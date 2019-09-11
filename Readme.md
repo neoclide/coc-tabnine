@@ -32,9 +32,10 @@ Use command `:CocConfig` to open user configuration file of coc.nvim.
 - _"tabnine.shortcut"_: Shortcut for tabnine source., default: `"TN"`
 - _"tabnine.triggers"_: Trigger characters of TabNine source, default: `[]`
 - _"tabnine.priority"_: Priority of tabnine source., default: `100`
-- _"tabnine.disable_filetypes"_: Disable TabNine with configured filetypes., default: `[]`
+- _"tabnine.binary_path"_: Use binary at specific path., default: `""`
+- _"tabnine.disable_filetypes"_: Disable TabNine for configured filetypes., default: `[]`
+- _"tabnine.disable_file_regex"_: Disable TabNine when the file path contains a match of any of the provided regexes. For example, add "[.]js\$" to disable TabNine in JavaScript files., default: `[]`
 - _"tabnine.disable_line_regex"_: Disable TabNine when the current line contains a match of any of the provided regexes. For example, add "require" to disable TabNine when the current line contains the word 'require'., default: `[]`
-- "tabnine.disable_file_regex": Disable TabNine when the file path contains a match of any of the provided regexes. For example, add "[.]js\$" to disable TabNine in JavaScript files., default: `[]`
 
 ## License
 
