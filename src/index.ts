@@ -14,18 +14,23 @@ const MAX_NUM_RESULTS = 5
 const DEFAULT_DETAIL = "TabNine"
 
 export async function activate(context: ExtensionContext): Promise<void> {
-  let { subscriptions } = context
   const configuration = workspace.getConfiguration('tabnine')
-  const tabNine = new TabNine(context.storagePath)
-  let binaryRoot = path.join(context.storagePath, 'binaries')
-  if (!fs.existsSync(binaryRoot)) {
-    mkdirp.sync(binaryRoot)
-  }
-  await TabNine.installTabNine(binaryRoot)
+  const { subscriptions } = context
 
-  let priority = configuration.get<number>('priority', undefined)
-  let disable_filetypes = configuration.get<string[]>('disable_filetypes', [])
-  let limit = configuration.get<number>('limit', 10)
+  const binaryPath = configuration.get<string>('binary_path', undefined)
+  const disable_filetypes = configuration.get<string[]>('disable_filetypes', [])
+  const limit = configuration.get<number>('limit', 10)
+  const priority = configuration.get<number>('priority', undefined)
+
+  const tabNine = new TabNine(context.storagePath, binaryPath)
+  if (!binaryPath) {
+    const binaryRoot = path.join(context.storagePath, 'binaries')
+    await TabNine.installTabNine(binaryRoot)
+  } else {
+    if(!fs.existsSync(binaryPath)) {
+      throw new Error('Specified path to TabNine binary not found. ' + binaryPath)
+    }
+  }
 
   subscriptions.push(commands.registerCommand('tabnine.openConfig', async () => {
     const res = await tabNine.request("2.0.0", {
@@ -245,14 +250,17 @@ interface MarkdownStringSpec {
 }
 
 class TabNine {
+  private childDead: boolean
+  private binaryPath?: string
+  private mutex: Mutex = new Mutex()
+  private numRestarts = 0
   private proc: child_process.ChildProcess
   private rl: readline.ReadLine
-  private numRestarts = 0
-  private childDead: boolean
-  private mutex: Mutex = new Mutex()
+  private storagePath: string
 
-  constructor(private storagePath: string) {
-    // noop
+  constructor(storagePath: string, binaryPath?: string) {
+    this.storagePath = storagePath
+    this.binaryPath = binaryPath
   }
 
   public async request(version: string, any_request: any): Promise<any> {
@@ -306,11 +314,12 @@ class TabNine {
     const args = [
       "--client=vscode",
     ]
-    const binary_root = path.join(this.storagePath, "binaries")
-    const command = TabNine.getBinaryPath(binary_root)
-    this.proc = child_process.spawn(command, args)
+
+    const binaryPath = this.binaryPath || TabNine.getBinaryPath(path.join(this.storagePath, "binaries"))
+
+    this.proc = child_process.spawn(binaryPath, args)
     this.childDead = false
-    this.proc.on('exit', (code, signal) => {
+    this.proc.on('exit', () => {
       this.childDead = true
     })
     this.proc.stdin.on('error', error => {
@@ -332,8 +341,12 @@ class TabNine {
 
   // install if not exists
   public static async installTabNine(root: string): Promise<void> {
+    if (!fs.existsSync(root)) {
+      mkdirp.sync(root)
+    }
+
     try {
-      let path = TabNine.getBinaryPath(root)
+      const path = TabNine.getBinaryPath(root)
       if (path) return
     } catch (e) {
       // noop
