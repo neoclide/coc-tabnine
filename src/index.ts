@@ -367,17 +367,19 @@ class TabNine {
       throw new Error('TabNine not installed')
     }
 
-    TabNine.sortBySemver(versions)
+    const sortedVersions = TabNine.sortBySemver(versions)
 
     const tried = []
-    for (let version of versions) {
-      const full_path = `${root}/${version}/${archAndPlatform}`
-      tried.push(full_path)
-      if (fs.existsSync(full_path)) {
-        return full_path
+    for (const version of sortedVersions) {
+      const fullPath = `${root}/${version}/${archAndPlatform}`
+
+      if (fs.existsSync(fullPath)) {
+        return fullPath
+      } else {
+        tried.push(fullPath)
       }
     }
-    throw new Error(`Couldn't find a TabNine binary (tried the following paths: versions=${versions} ${tried})`)
+    throw new Error(`Couldn't find a TabNine binary (tried the following paths: versions=${sortedVersions} ${tried})`)
   }
 
   private static getArchAndPlatform(): string {
@@ -411,8 +413,8 @@ class TabNine {
     return `${arch}-${suffix}`
   }
 
-  private static sortBySemver(versions: string[]): void {
-    versions.sort(TabNine.cmpSemver)
+  private static sortBySemver(versions: string[]): string[] {
+    return versions.sort(TabNine.cmpSemver)
   }
 
   private static cmpSemver(a: string, b: string): number {
