@@ -21,25 +21,27 @@ In your vim/neovim, run command:
 
 Run `:CocCommand` to open commands list.
 
-- `tabnine.openConfig`: open config file of tabnine.
+- `tabnine.openConfig`: open config file of TabNine.
 
-_Note_: to make coc.nvim works better with TabNine, add `"ignore_all_lsp": true` to config file of tabnine.
+_Note_: to make coc.nvim works better with TabNine, add `"ignore_all_lsp": true` to config file of TabNine.
 
 ## Configuration
 
 Use command `:CocConfig` to open user configuration file of coc.nvim.
 
-- `tabnine.shortcut`: Shortcut for tabnine source., default: `"TN"`
-- `tabnine.triggers`: Trigger characters of TabNine source, default: `[]`
-- `tabnine.priority`: Priority of tabnine source., default: `100`
-- `tabnine.binary_path`: Use binary at specific path., default: `""`
-- `tabnine.disable_filetypes`: Disable TabNine for configured filetypes., default: `[]`
-- `tabnine.disable_file_regex`: Disable TabNine when the file path contains a match of any of the provided regexes. For example, add `[.]js\$` to disable TabNine in JavaScript files., default: `[]`
-- `tabnine.disable_line_regex`: Disable TabNine when the current line contains a match of any of the provided regexes. For example, add "require" to disable TabNine when the current line contains the word 'require'., default: `[]`
+| Option                       | Description                                                                                                                                                                               | Default value |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :-----------: |
+| `tabnine.shortcut`           | Shortcut for TabNine source.                                                                                                                                                              |    `"TN"`     |
+| `tabnine.triggers`           | Trigger characters of TabNine source.                                                                                                                                                     |     `[]`      |
+| `tabnine.priority`           | Priority of TabNine source.                                                                                                                                                               |     `100`     |
+| `tabnine.binary_path`        | Use binary at specific path.                                                                                                                                                              |     `""`      |
+| `tabnine.disable_filetypes`  | Disable TabNine for configured filetypes.                                                                                                                                                 |     `[]`      |
+| `tabnine.disable_file_regex` | Disable TabNine when the file path contains a match of any of the provided regexes. For example, add `"[.]js\$"` to disable TabNine in JavaScript files.                                  |     `[]`      |
+| `tabnine.disable_line_regex` | Disable TabNine when the current line contains a match of any of the provided regexes. For example, add `"require"` to disable TabNine when the current line contains the word `require`. |     `[]`      |
 
 ## Magic Strings
 
-Configure TabNine itself by inputting a *magic string* like `TabNine::config` or `TabNine::restart` in any buffer and trigger autocomplete. A full list of available *magic strings* is available here: https://tabnine.com/faq/#magic_strings.
+Configure TabNine itself by inputting a _magic string_ like `TabNine::config` or `TabNine::restart` in any buffer and trigger autocomplete. A full list of available _magic strings_ is available here: https://tabnine.com/faq/#magic_strings.
 
 ## License
 
