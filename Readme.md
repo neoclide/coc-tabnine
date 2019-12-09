@@ -29,13 +29,17 @@ _Note_: to make coc.nvim works better with TabNine, add `"ignore_all_lsp": true`
 
 Use command `:CocConfig` to open user configuration file of coc.nvim.
 
-- _"tabnine.shortcut"_: Shortcut for tabnine source., default: `"TN"`
-- _"tabnine.triggers"_: Trigger characters of TabNine source, default: `[]`
-- _"tabnine.priority"_: Priority of tabnine source., default: `100`
-- _"tabnine.binary_path"_: Use binary at specific path., default: `""`
-- _"tabnine.disable_filetypes"_: Disable TabNine for configured filetypes., default: `[]`
-- _"tabnine.disable_file_regex"_: Disable TabNine when the file path contains a match of any of the provided regexes. For example, add "[.]js\$" to disable TabNine in JavaScript files., default: `[]`
-- _"tabnine.disable_line_regex"_: Disable TabNine when the current line contains a match of any of the provided regexes. For example, add "require" to disable TabNine when the current line contains the word 'require'., default: `[]`
+- `tabnine.shortcut`: Shortcut for tabnine source., default: `"TN"`
+- `tabnine.triggers`: Trigger characters of TabNine source, default: `[]`
+- `tabnine.priority`: Priority of tabnine source., default: `100`
+- `tabnine.binary_path`: Use binary at specific path., default: `""`
+- `tabnine.disable_filetypes`: Disable TabNine for configured filetypes., default: `[]`
+- `tabnine.disable_file_regex`: Disable TabNine when the file path contains a match of any of the provided regexes. For example, add `[.]js\$` to disable TabNine in JavaScript files., default: `[]`
+- `tabnine.disable_line_regex`: Disable TabNine when the current line contains a match of any of the provided regexes. For example, add "require" to disable TabNine when the current line contains the word 'require'., default: `[]`
+
+## Magic Strings
+
+Configure TabNine itself by inputting a *magic string* like `TabNine::config` or `TabNine::restart` in any buffer and trigger autocomplete. A full list of available *magic strings* is available here: https://tabnine.com/faq/#magic_strings.
 
 ## License
 
