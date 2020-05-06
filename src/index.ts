@@ -312,7 +312,7 @@ class TabNine {
       this.proc.kill()
     }
     const args = [
-      "--client=vscode",
+      "--client=coc.nvim",
     ]
 
     const binaryPath = this.binaryPath || TabNine.getBinaryPath(path.join(this.storagePath, "binaries"))
