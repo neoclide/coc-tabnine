@@ -1,6 +1,6 @@
 {
   "name": "coc-tabnine",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "tabnine extension for coc.nvim",
   "main": "lib/index.js",
   "publisher": "chemzqm",
