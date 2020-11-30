@@ -27,7 +27,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
     const binaryRoot = path.join(context.storagePath, 'binaries')
     await TabNine.installTabNine(binaryRoot)
   } else {
-    if(!fs.existsSync(binaryPath)) {
+    if (!fs.existsSync(binaryPath)) {
       throw new Error('Specified path to TabNine binary not found. ' + binaryPath)
     }
   }
@@ -352,7 +352,7 @@ class TabNine {
       // noop
     }
 
-    const version = (await fetch('https://update.tabnine.com/version')).trim()
+    const version = (await fetch('https://update.tabnine.com/version')).toString().trim()
     const archAndPlatform = TabNine.getArchAndPlatform()
     const url = `https://update.tabnine.com/${version}/${archAndPlatform}`
     const item = workspace.createStatusBarItem(0, { progress: true })
