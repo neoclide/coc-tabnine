@@ -1,12 +1,12 @@
-import { fetch, commands, Uri, ExtensionContext, workspace, languages } from 'coc.nvim'
-import { Range, CompletionItem, CompletionList, TextDocument, Position, CancellationToken, CompletionContext, TextEdit, MarkupContent, MarkupKind, CompletionItemKind, InsertTextFormat } from 'vscode-languageserver-protocol'
+import { Mutex } from 'await-semaphore'
 import child_process from 'child_process'
-import semver from 'semver'
+import { commands, ExtensionContext, fetch, languages, Uri, window, workspace } from 'coc.nvim'
 import fs from 'fs'
+import mkdirp from 'mkdirp'
 import path from 'path'
 import readline from 'readline'
-import { Mutex } from 'await-semaphore'
-import mkdirp from 'mkdirp'
+import semver from 'semver'
+import { CancellationToken, CompletionContext, CompletionItem, CompletionItemKind, CompletionList, InsertTextFormat, MarkupContent, MarkupKind, Position, Range, TextDocument, TextEdit } from 'vscode-languageserver-protocol'
 import download from './download'
 
 const CHAR_LIMIT = 100000
@@ -44,7 +44,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
       }
     })
     if (!res.results || res.results.length < 0) {
-      workspace.showMessage('TabNine::config_dir return empty result', 'error')
+      window.showMessage('TabNine::config_dir return empty result', 'error')
       return
     }
     let folder = res.results[0].new_prefix
@@ -355,7 +355,7 @@ class TabNine {
     const version = (await fetch('https://update.tabnine.com/version')).toString().trim()
     const archAndPlatform = TabNine.getArchAndPlatform()
     const url = `https://update.tabnine.com/${version}/${archAndPlatform}`
-    const item = workspace.createStatusBarItem(0, { progress: true })
+    const item = window.createStatusBarItem(0, { progress: true })
 
     item.text = 'Downloading TabNine'
     item.show()
@@ -367,7 +367,7 @@ class TabNine {
       })
       fs.chmodSync(dest, 0o755)
     } catch (e) {
-      workspace.showMessage(`Download error ${e.message}`, 'error')
+      window.showMessage(`Download error ${e.message}`, 'error')
     }
     item.dispose()
   }

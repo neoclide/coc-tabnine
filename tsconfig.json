@@ -4,7 +4,7 @@
     "declaration": false,
     "noUnusedLocals": true,
     "outDir": "lib",
-    "target": "es2015",
+    "target": "es2017",
     "module": "commonjs",
     "moduleResolution": "node",
     "lib": ["es2018"],
