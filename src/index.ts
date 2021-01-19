@@ -1,12 +1,11 @@
 import { Mutex } from 'await-semaphore'
 import child_process from 'child_process'
-import { commands, ExtensionContext, fetch, languages, Uri, window, workspace } from 'coc.nvim'
+import { CancellationToken, commands, CompletionContext, CompletionItem, CompletionItemKind, CompletionList, ExtensionContext, fetch, InsertTextFormat, languages, MarkupContent, Position, Range, TextDocument, TextEdit, Uri, window, workspace } from 'coc.nvim'
 import fs from 'fs'
 import mkdirp from 'mkdirp'
 import path from 'path'
 import readline from 'readline'
 import semver from 'semver'
-import { CancellationToken, CompletionContext, CompletionItem, CompletionItemKind, CompletionList, InsertTextFormat, MarkupContent, MarkupKind, Position, Range, TextDocument, TextEdit } from 'vscode-languageserver-protocol'
 import download from './download'
 
 const CHAR_LIMIT = 100000
@@ -181,7 +180,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
     if (isMarkdownStringSpec(documentation)) {
       if (documentation.kind == "markdown") {
         return {
-          kind: MarkupKind.Markdown,
+          kind: 'markdown',
           value: documentation.value
         }
       } else {
@@ -363,7 +362,7 @@ class TabNine {
     try {
       const dest = path.join(root, `${version}/${archAndPlatform}`)
       await download(url, dest, percent => {
-        item.text = `Downloading TabNine ${(percent * 100).toFixed(0)}%`
+        item.text = `Downloading TabNine ${percent}%`
       })
       fs.chmodSync(dest, 0o755)
     } catch (e) {
