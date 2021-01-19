@@ -7,9 +7,31 @@ const CHAR_LIMIT = 100000
 const MAX_NUM_RESULTS = 5
 const DEFAULT_DETAIL = "TabNine"
 
+interface AutocompleteResult {
+  old_prefix: string,
+  results: ResultEntry[],
+  user_message: string[],
+}
+
+interface ResultEntry {
+  new_prefix: string,
+  old_suffix: string,
+  new_suffix: string,
+
+  kind?: CompletionItemKind,
+  detail?: string,
+  documentation?: string | MarkdownStringSpec,
+  deprecated?: boolean
+}
+
+interface MarkdownStringSpec {
+  kind: string,
+  value: string
+}
+
 export async function activate(context: ExtensionContext): Promise<void> {
   const configuration = workspace.getConfiguration('tabnine')
-  const { subscriptions } = context
+  const { subscriptions, logger } = context
 
   const binaryPath = configuration.get<string>('binary_path', undefined)
   const disable_filetypes = configuration.get<string[]>('disable_filetypes', [])
@@ -19,13 +41,33 @@ export async function activate(context: ExtensionContext): Promise<void> {
 
   const tabNine = new TabNine(context.storagePath, binaryPath)
   if (!binaryPath) {
-    const binaryRoot = path.join(context.storagePath, 'binaries')
-    await TabNine.installTabNine(binaryRoot)
+    const root = path.join(context.storagePath, 'binaries')
+    let binaryPath: string
+    try {
+      binaryPath = TabNine.getBinaryPath(root)
+    } catch (e) {
+      logger.error(e.message)
+    }
+    if (binaryPath) {
+      logger.info(`Using tabnine from ${binaryPath}`)
+    } else {
+      await TabNine.installTabNine(root)
+    }
   } else {
     if (!fs.existsSync(binaryPath)) {
       throw new Error('Specified path to TabNine binary not found. ' + binaryPath)
     }
   }
+
+  subscriptions.push(commands.registerCommand('tabnine.updateTabNine', async () => {
+    if (binaryPath) {
+      window.showMessage(`Cant't update user defined tabnine: ${binaryPath}`)
+      return
+    }
+    const root = path.join(context.storagePath, 'binaries')
+    await TabNine.updateTabNine(root)
+    window.showMessage('Restart coc.nvim by :CocRestart to use latest TabNine.')
+  }))
 
   subscriptions.push(commands.registerCommand('tabnine.openConfig', async () => {
     const res = await tabNine.request("2.0.0", {
@@ -225,26 +267,4 @@ export async function activate(context: ExtensionContext): Promise<void> {
     }
     return true
   }
-}
-
-interface AutocompleteResult {
-  old_prefix: string,
-  results: ResultEntry[],
-  user_message: string[],
-}
-
-interface ResultEntry {
-  new_prefix: string,
-  old_suffix: string,
-  new_suffix: string,
-
-  kind?: CompletionItemKind,
-  detail?: string,
-  documentation?: string | MarkdownStringSpec,
-  deprecated?: boolean
-}
-
-interface MarkdownStringSpec {
-  kind: string,
-  value: string
 }

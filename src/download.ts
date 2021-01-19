@@ -1,5 +1,5 @@
 import { download } from 'coc.nvim'
-import fs from 'fs'
+import fs from 'fs-extra'
 import path from 'path'
 
 /**
@@ -9,7 +9,9 @@ export default async function downloadBinary(url: string, dest: string, onProgre
   if (!dest || !path.isAbsolute(dest)) {
     throw new Error(`Expect absolute file path for dest option.`)
   }
-  if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true })
+  if (!fs.existsSync(dest)) {
+    fs.mkdirpSync(dest)
+  }
   await download(url, {
     dest,
     onProgress: percent => {

@@ -1,8 +1,7 @@
 import { Mutex } from 'await-semaphore'
 import child_process from 'child_process'
 import { fetch, window } from 'coc.nvim'
-import fs from 'fs'
-import mkdirp from 'mkdirp'
+import fs from 'fs-extra'
 import path from 'path'
 import readline from 'readline'
 import semver from 'semver'
@@ -15,10 +14,8 @@ export class TabNine {
   private numRestarts = 0
   private proc: child_process.ChildProcess
   private rl: readline.ReadLine
-  private storagePath: string
 
-  constructor(storagePath: string, binaryPath?: string) {
-    this.storagePath = storagePath
+  constructor(private storagePath: string, binaryPath?: string) {
     this.binaryPath = binaryPath
   }
 
@@ -100,17 +97,6 @@ export class TabNine {
 
   // install if not exists
   public static async installTabNine(root: string): Promise<void> {
-    if (!fs.existsSync(root)) {
-      mkdirp.sync(root)
-    }
-
-    try {
-      const path = TabNine.getBinaryPath(root)
-      if (path) return
-    } catch (e) {
-      // noop
-    }
-
     const version = (await fetch('https://update.tabnine.com/bundles/version')).toString().trim()
     const archAndPlatform = TabNine.getArchAndPlatform()
     // https://update.tabnine.com/bundles/3.3.34/x86_64-apple-darwin/TabNine.zip
@@ -138,7 +124,20 @@ export class TabNine {
     item.dispose()
   }
 
-  private static getBinaryPath(root: string): string {
+  public static async updateTabNine(root: string): Promise<void> {
+    const version = (await fetch('https://update.tabnine.com/bundles/version')).toString().trim()
+    const archAndPlatform = TabNine.getArchAndPlatform()
+    const fullpath = path.join(root, `${version}/${archAndPlatform}`, `TabNine${process.platform == 'win32' ? '.exe' : ''}`)
+    if (fs.existsSync(fullpath)) {
+      let force = await window.showPrompt(`Latest version ${version} already exists, force update?`)
+      if (!force) return
+      fs.emptyDirSync(path.dirname(fullpath))
+    }
+    await TabNine.installTabNine(root)
+  }
+
+
+  public static getBinaryPath(root: string): string {
     const archAndPlatform = TabNine.getArchAndPlatform()
     const versions = fs.readdirSync(root)
 
