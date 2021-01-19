@@ -44,6 +44,14 @@
           "default": null,
           "description": "Priority of tabnine source, use priority of languageserver by default."
         },
+        "tabnine.filetypes": {
+          "type": [
+            "array",
+            null
+          ],
+          "default": null,
+          "description": "Enabled filetypes for completion, default to all filetypes."
+        },
         "tabnine.binary_path": {
           "type": "string",
           "default": "",

@@ -18,6 +18,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
 
   const binaryPath = configuration.get<string>('binary_path', undefined)
   const disable_filetypes = configuration.get<string[]>('disable_filetypes', [])
+  const filetypes = configuration.get<string[] | null>('filetypes', null)
   const limit = configuration.get<number>('limit', 10)
   const priority = configuration.get<number>('priority', undefined)
 
@@ -51,7 +52,9 @@ export async function activate(context: ExtensionContext): Promise<void> {
     await workspace.openResource(Uri.file(file).toString())
   }))
 
-  subscriptions.push(languages.registerCompletionItemProvider('tabnine', configuration.get<string>('shortcut', 'TN'), null, {
+  subscriptions.push(languages.registerCompletionItemProvider('tabnine',
+    configuration.get<string>('shortcut', 'TN'),
+    filetypes, {
     async provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken, context: CompletionContext): Promise<CompletionList | undefined | null> {
       if (disable_filetypes.indexOf(document.languageId) !== -1) return null
       let { option } = context as any
@@ -73,6 +76,9 @@ export async function activate(context: ExtensionContext): Promise<void> {
             max_num_results: MAX_NUM_RESULTS,
           }
         })
+        if (token.isCancellationRequested) {
+          return undefined
+        }
         if (!completionIsAllowed(document, position)) {
           return undefined
         }
