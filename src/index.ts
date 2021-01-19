@@ -404,6 +404,9 @@ class TabNine {
       case 'x64':
         arch = 'x86_64'
         break
+      case 'arm64':
+        arch = 'aarch64'
+        break
       default:
         throw new Error(`Sorry, the architecture '${process.arch}' is not supported by TabNine.`)
     }
