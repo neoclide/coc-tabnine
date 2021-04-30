@@ -183,6 +183,7 @@ export class TabNine {
       case 'darwin':
         suffix = 'apple-darwin'
         break
+      case 'freebsd':
       case 'linux':
         suffix = 'unknown-linux-musl'
         break
