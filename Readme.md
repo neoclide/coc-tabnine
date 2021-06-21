@@ -41,11 +41,11 @@ Use command `:CocConfig` to open user configuration file of coc.nvim.
 
 ## Magic Strings
 
-Configure TabNine itself by inputting a _magic string_ like `TabNine::config` or `TabNine::restart` in any buffer and trigger autocomplete. A full list of available _magic strings_ is available here: https://tabnine.com/faq/#magic_strings.
+Configure TabNine itself by inputting a `special_commands` string\_ like `TabNine::config` or `TabNine::restart` in any buffer and trigger autocomplete. A full list of available `special_commands` is available here: https://www.tabnine.com/faq#special_commands
 
 ### API Key
 
-This library does not configure Tabnine's Pro API key, if you've purchased a subscription license. To configure, you'll need to use the `TabNine::config` magic string to update your preferences. 
+This library does not configure Tabnine's Pro API key, if you've purchased a subscription license. To configure, you'll need to use the `TabNine::config` magic string to update your preferences.
 
 > _Note: An API key is not required to use [`coc-tabnine`](#coc-tabine)._
 
