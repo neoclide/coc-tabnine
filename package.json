@@ -52,7 +52,7 @@
         "tabnine.priority": {
           "type": "number",
           "default": null,
-          "description": "Priority of tabnine source, use priority of languageserver by default."
+          "description": "Priority of tabnine source, use value from 'suggest.languageSourcePriority' by default."
         },
         "tabnine.filetypes": {
           "type": [
