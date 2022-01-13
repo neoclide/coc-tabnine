@@ -51,8 +51,8 @@
         },
         "tabnine.priority": {
           "type": "number",
-          "default": null,
-          "description": "Priority of tabnine source, use value from 'suggest.languageSourcePriority' by default."
+          "default": 999,
+          "description": "Priority of tabnine source"
         },
         "tabnine.filetypes": {
           "type": [
