@@ -89,6 +89,10 @@ export async function activate(context: ExtensionContext): Promise<void> {
     await workspace.openResource(Uri.file(file).toString())
   }))
 
+  subscriptions.push(commands.registerCommand('tabnine.openHub', async () => {
+   await tabNine.request("2.0.0", { Configuration: {} } )
+  }))
+
   subscriptions.push(languages.registerCompletionItemProvider('tabnine',
     configuration.get<string>('shortcut', 'TN'),
     filetypes, {

@@ -20,12 +20,16 @@
   "contributes": {
     "commands": [
       {
-        "title": "Open configuration file of tabnine.",
+        "title": "Open configuration file of Tabnine.",
         "command": "tabnine.openConfig"
       },
       {
-        "title": "Download latest version of tabnine.",
+        "title": "Download latest version of Tabnine.",
         "command": "tabnine.updateTabNine"
+      },
+      {
+        "title": "Open Tabnine hub.",
+        "command": "tabnine.openHub"
       }
     ],
     "configuration": {
