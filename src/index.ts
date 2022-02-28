@@ -90,7 +90,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
   }))
 
   subscriptions.push(commands.registerCommand('tabnine.openHub', async () => {
-   await tabNine.request("2.0.0", { Configuration: {} } )
+    await tabNine.request("2.0.0", { Configuration: {} })
   }))
 
   subscriptions.push(languages.registerCompletionItemProvider('tabnine',
@@ -153,6 +153,9 @@ export async function activate(context: ExtensionContext): Promise<void> {
             }
             results.push(item)
             index += 1
+          }
+          if (!hasPreselect && results.length && configuration.get<boolean>('enablePreselect', true)) {
+            results[0].preselect = true
           }
           completionList = { items: results.slice(0, limit), isIncomplete: option.input.length <= 3 }
         }

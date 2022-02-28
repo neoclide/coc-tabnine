@@ -53,6 +53,11 @@
           "default": 10,
           "description": "Limit max completion item count from tabnine."
         },
+        "tabnine.enablePreselect": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable preselect for first complete item returned from tabnine."
+        },
         "tabnine.priority": {
           "type": "number",
           "default": 999,
