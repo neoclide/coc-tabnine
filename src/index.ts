@@ -48,7 +48,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
     } catch (e) {
       logger.error(e.message)
     }
-    if (binaryPath) {
+    if (fs.existsSync(binaryPath)) {
       logger.info(`Using tabnine from ${binaryPath}`)
     } else {
       await TabNine.installTabNine(root)
