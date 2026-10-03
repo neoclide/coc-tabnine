@@ -1,5 +1,7 @@
 # coc-tabnine
 
+> **Deprecated:** coc-tabnine is no longer maintained.
+
 Fork of [tabnine-vscode](https://github.com/zxqfl/tabnine-vscode)
 
 This is the [coc.nvim](https://github.com/neoclide/coc.nvim) client for [Tabnine](https://tabnine.com), the all-language autocompleter.
